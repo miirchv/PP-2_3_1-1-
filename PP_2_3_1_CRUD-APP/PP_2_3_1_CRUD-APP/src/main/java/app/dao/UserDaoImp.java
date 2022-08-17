@@ -1,16 +1,23 @@
 package app.dao;
 
 import app.model.User;
-import app.util.Util;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class UserDaoImp implements UserDao {
+
+    private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("persistence");
+
+    private EntityManager getEntityManager() {
+        return entityManagerFactory.createEntityManager();
+    }
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -21,7 +28,7 @@ public class UserDaoImp implements UserDao {
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         try  {
-            entityManager = Util.getEntityManager();
+            entityManager = getEntityManager();
             entityManager.getTransaction().begin();
             list = entityManager.createQuery("FROM User").getResultList();
         } catch (Exception e) {
@@ -36,7 +43,7 @@ public class UserDaoImp implements UserDao {
     public User getUserById(long id) {
         List<User> list = new ArrayList<>();
         try {
-            entityManager = Util.getEntityManager();
+            entityManager = getEntityManager();
             entityManager.getTransaction().begin();;
             list = entityManager.createQuery("select a from User a", User.class).getResultList();
         } catch (Exception e) {
@@ -52,7 +59,7 @@ public class UserDaoImp implements UserDao {
     @Override
     public void saveUser(User user) {
         try {
-            entityManager = Util.getEntityManager();
+            entityManager = getEntityManager();
             entityManager.getTransaction().begin();
             User newUser = new User();
             newUser.setName(user.getName());
@@ -71,7 +78,7 @@ public class UserDaoImp implements UserDao {
     public void updateUser(long id, User updatedUser) {
 
         try {
-            entityManager = Util.getEntityManager();
+            entityManager = getEntityManager();
             entityManager.getTransaction().begin();
             User user =  entityManager.find(User.class, id);
             user.setName(updatedUser.getName());
@@ -91,7 +98,7 @@ public class UserDaoImp implements UserDao {
     public void deleteUser(long id) {
 
         try {
-            entityManager = Util.getEntityManager();
+            entityManager = getEntityManager();
             entityManager.getTransaction().begin();
             User user = entityManager.find(User.class, id);
             entityManager.remove(user);
